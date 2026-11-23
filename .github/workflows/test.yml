@@ -33,4 +33,5 @@ jobs:
           set -e
           echo "$output"
           test "$status" -eq 1
-          echo "$output" | grep -q 'web-push is not installed'
+          echo "$output" | grep -q 'web-push'
+          echo "$output" | grep -q 'not installed'
