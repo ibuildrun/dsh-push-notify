@@ -246,7 +246,14 @@ test('a timed-out request never throws', async () => {
       }),
     env: {},
   })
-  assert.equal(await notifier.send(buildTurnEndMessage()), false)
+  // Keep the event loop referenced: the notifier's abort timer is unref'd so it
+  // never holds the host open, and the loop must stay alive for it to fire.
+  const keepAlive = setTimeout(() => {}, 500)
+  try {
+    assert.equal(await notifier.send(buildTurnEndMessage()), false)
+  } finally {
+    clearTimeout(keepAlive)
+  }
 })
 
 test('a non-2xx relay response reports failure without throwing', async () => {
@@ -349,7 +356,7 @@ test('turn-end hook previews the last assistant message', async () => {
   }
 })
 
-test('turn-end hook tolerates a waterfall continuation', () => {
+test('turn-end hook tolerates a waterfall continuation', async () => {
   const original = globalThis.fetch
   globalThis.fetch = recordingFetch().fetch
   try {
@@ -357,12 +364,13 @@ test('turn-end hook tolerates a waterfall continuation', () => {
     apply(ctx, { endpoint: 'http://127.0.0.1:8787/push/send', token: 'x' })
     const outcome = handlers.get('agent/turn-stopping')({ agent: null }, () => 'next-value')
     assert.equal(outcome, 'next-value')
+    await flush()
   } finally {
     globalThis.fetch = original
   }
 })
 
-test('turn-end hook never throws on an empty payload', () => {
+test('turn-end hook never throws on an empty payload', async () => {
   const original = globalThis.fetch
   globalThis.fetch = async () => {
     throw new Error('relay down')
@@ -372,6 +380,7 @@ test('turn-end hook never throws on an empty payload', () => {
     apply(ctx, { endpoint: 'http://127.0.0.1:8787/push/send', token: 'x' })
     assert.doesNotThrow(() => handlers.get('agent/turn-stopping')(null))
     assert.doesNotThrow(() => handlers.get('session/event')(null, null))
+    await flush()
   } finally {
     globalThis.fetch = original
   }
