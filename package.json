@@ -1,0 +1,49 @@
+{
+  "name": "dsh-push-notify",
+  "version": "0.1.0",
+  "description": "Web Push notifications for DeepSeek Harness: finished turns, approvals, and questions on your phone through your own relay.",
+  "license": "MIT",
+  "author": "ibuildrun",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "examples",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "web-push",
+    "notifications"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ibuildrun/dsh-push-notify"
+  },
+  "homepage": "https://github.com/ibuildrun/dsh-push-notify#readme",
+  "bugs": {
+    "url": "https://github.com/ibuildrun/dsh-push-notify/issues"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "engines": {
+      "dsh": ">=0.2.0"
+    }
+  }
+}

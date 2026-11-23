@@ -1,0 +1,36 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run the plugin tests (no install needed)
+        run: npm test
+
+      - name: Syntax check the plugin and the relay example
+        run: |
+          node --check lib/index.js
+          node --check examples/relay/server.mjs
+
+      - name: Smoke-check the relay without its optional dependency
+        run: |
+          set +e
+          output="$(node examples/relay/server.mjs 2>&1)"
+          status=$?
+          set -e
+          echo "$output"
+          test "$status" -eq 1
+          echo "$output" | grep -q 'web-push is not installed'

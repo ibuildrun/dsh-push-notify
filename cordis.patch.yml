@@ -1,0 +1,18 @@
+# dsh-push-notify bundle patch: inserts the host-side push-notify row.
+#
+# The row is inert until you configure an `endpoint` for your relay: an empty
+# endpoint means the feature is off. Configure it in your profile's own
+# cordis.patch.yml by overriding this row (a matching override replaces the
+# whole config):
+#
+#   - id: push-notify
+#     name: dsh-push-notify
+#     config:
+#       endpoint: https://push.example.test/push/send
+#       tokenEnv: DSH_PUSH_TOKEN
+#
+# The token itself is read from the environment at send time, so it never has
+# to be stored in a config file.
+- insert:
+    - id: push-notify
+      name: dsh-push-notify
